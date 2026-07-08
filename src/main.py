@@ -9,11 +9,16 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+# Works both as `python -m src.main` (relative) and `python src/main.py` (absolute).
+try:
+    from .recommender import load_songs, recommend_songs
+except ImportError:
+    from recommender import load_songs, recommend_songs
 
 
 def main() -> None:
-    songs = load_songs("data/songs.csv") 
+    songs = load_songs("data/songs.csv")
+    print(f"Loaded songs: {len(songs)}")
 
     # Taste profile: a "lofi study / chill" listener.
     # Categorical targets are matched for a bonus; numeric targets are on a 0.0-1.0
@@ -39,14 +44,20 @@ def main() -> None:
 
     recommendations = recommend_songs(user_prefs, songs, k=5)
 
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
-        print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
-        print()
+    genre = user_prefs["favorite_genre"]
+    mood = user_prefs["favorite_mood"]
+    print(f"\nTop {len(recommendations)} recommendations "
+          f"for a '{genre} / {mood}' listener")
+    print("=" * 56)
+
+    for rank, (song, score, explanation) in enumerate(recommendations, start=1):
+        print(f"\n{rank}. {song['title']} - {song['artist']}  "
+              f"[{song['genre']} / {song['mood']}]")
+        print(f"   Score: {score:.2f}")
+        print("   Reasons:")
+        # explanation is a "; "-joined string of reasons; show one per line.
+        for reason in explanation.split("; "):
+            print(f"     - {reason}")
 
 
 if __name__ == "__main__":
