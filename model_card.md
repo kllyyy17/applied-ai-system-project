@@ -2,110 +2,175 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeMatch 1.0**
+
+It matches you to songs that fit your vibe: your favorite genre, your mood, and
+how much energy you want.
 
 ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
+VibeMatch takes a short taste profile and returns the top 5 songs from a small
+catalog. Each pick comes with a plain-English reason, like "genre match" or
+"energy fit 90%."
 
-Prompts:  
+It assumes the user can name a favorite genre, a mood, and roughly how much
+energy they want. It assumes their taste is stable and can be summed up in a few
+numbers.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+This is for classroom exploration, not real users. It is a simulation built to
+learn how recommender scoring works, not a product.
+
+**Non-intended use.** Do not use it to recommend music to real listeners, to
+judge songs or artists, or to make any real decision. The catalog is tiny and
+hand-made, so it does not reflect real listening data.
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
+Think of it as a judge that gives each song points. The song with the most
+points wins.
 
-Prompts:  
+Every song has a genre, a mood, and five dials: energy, tempo, valence (how
+happy it sounds), danceability, and acousticness. The user gives their favorite
+genre, favorite mood, and a target for each dial.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
+Points come in two ways:
 
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+- **Genre and mood are all-or-nothing.** If the song's genre matches, it gets a
+  flat bonus (+2.0). Same for mood (+1.0). No match means no points.
+- **The dials reward closeness.** For each dial, the closer the song is to what
+  the user wants, the more points it earns. A perfect match earns the full
+  weight. The further off, the fewer points.
+
+I add up all the points and rank the songs from highest to lowest. Not every
+dial matters the same. Energy is weighted heaviest (2.0), then acousticness
+(1.5), and the rest count less.
+
+**What I changed from the starter.** The starter just handed back the first 5
+songs in the file. I wrote the real scoring math, added a reason string for
+every pick so you can see where the points came from, and normalized tempo (it
+is stored in BPM but the other dials run 0 to 1). I also built a set of test
+profiles to stress the system.
 
 ---
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
+The catalog is a single CSV file with **20 songs**. Each song has a title,
+artist, genre, mood, and five numeric features: energy, tempo (BPM), valence,
+danceability, and acousticness.
 
-Prompts:  
+The genres are spread thin. There are **17 genres across 20 songs**. Only lofi
+(3 songs) and pop (2 songs) have more than one. Everything else — classical,
+folk, reggae, blues, metal, jazz, and more — has exactly one song. Moods are
+just as scattered.
 
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+I used the starter dataset as-is. I did not add or remove songs.
+
+**What is missing.** A lot. There is no year, no language, no lyrics, and no
+real listening history. Whole styles of music are absent. With only one song
+per genre, a niche listener basically has one true match and nothing else. Real
+taste is far richer than 20 rows can hold.
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
+VibeMatch works best for clear, mainstream tastes that live in the catalog.
 
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+- **Chill Lofi** and **High-Energy Pop** got clean, sensible lists. These
+  genres have more than one song, so the picks felt coherent and matched my gut.
+- **The energy dial really works.** Chill Lofi got quiet, slow songs. High-Energy
+  Pop and Deep Intense Rock got loud, fast ones. The two calm and loud lists had
+  no overlap, which is exactly right.
+- **Same energy, different mood is captured.** Pop and Rock both want high
+  energy and share some songs, but their #1 picks differ: Pop lands on a happy
+  song, Rock on a dark one. The mood and valence points pull them apart.
+- **The reasons are honest.** Every pick shows where its points came from, so
+  it is easy to see why a song ranked where it did.
 
 ---
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+The clearest weakness I found is a **genre filter bubble driven by catalog imbalance**. Of the
+20 songs, 15 of the 17 genres are represented by a single track (only lofi has three and pop
+has two), so a lofi or pop listener gets a tight, coherent top of the list while a classical,
+folk, reggae, or blues fan has just one true match and is force-fed cross-genre songs at ranks
+2–5. This is made worse by the scoring math: the flat +2.0 genre bonus plus energy being the
+heaviest numeric weight (2.0) means the "energy gap" quietly dominates the ranking, so listeners
+who care most about mood or acousticness are still ranked mainly on how close their energy is.
+My weight-shift experiment confirmed the sensitivity — doubling energy and halving genre flipped
+the adversarial "sad + high-energy" profile so a loud `metal / angry` track outranked the true
+`blues / somber` match. In short, the system serves well-represented, energy-defined mainstream
+tastes far better than niche or mood-driven users, and it never signals when it is padding the
+list with songs the user did not actually ask for.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+**Profiles I tested.** I ran five listeners through the system. Three were realistic:
+**High-Energy Pop** (loud, fast, danceable), **Chill Lofi** (calm, slow, acoustic), and
+**Deep Intense Rock** (loud, fast, heavy). Two were tricky edge cases: **The Contradiction**
+(wants sad music, but high energy) and **The Blank Slate** (no preferences at all). For each
+one I checked the top 5 songs, their scores, and the reasons.
 
-Prompts:  
+**What surprised me.** The same loud songs kept showing up for very different people. Also, the
+Blank Slate still gave five "recommendations" even though every score was 0.00. It just listed
+songs in the order they appear in the file. That is not a real recommendation.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
+**Comparing the profiles (what changed, and why it makes sense):**
 
-No need for numeric metrics unless you created some.
+- **High-Energy Pop vs. Chill Lofi.** Total opposites. Pop gets loud, fast songs. Lofi gets quiet,
+  slow, acoustic songs. This shows the energy dial really works.
+
+- **High-Energy Pop vs. Deep Intense Rock.** Both want high energy. So they share some songs (like
+  Gym Hero). But the #1 pick is different. Pop picks a happy song. Rock picks a dark, heavy song.
+  Same energy, different mood.
+
+- **Chill Lofi vs. Deep Intense Rock.** The biggest contrast. One list is all calm. The other is
+  all loud. No overlap. That makes sense — they sit at opposite ends of the energy dial.
+
+- **Deep Intense Rock vs. The Contradiction.** These lists look alike. Both show rock and metal.
+  But the Contradiction asked for sad, quiet blues. The high-energy request took over. The loud
+  songs almost win. Only the genre and mood bonus lets the one true blues song reach #1.
+
+- **Any real profile vs. The Blank Slate.** A real profile gives clear scores, about 6 to 9. The
+  Blank Slate gives five songs all tied at 0.00. This shows the system has no "I don't know you
+  yet" fallback. It just lists whatever comes first.
 
 ---
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
+If I kept building this, I would:
 
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+1. **Add a "we don't know you yet" fallback.** Right now the Blank Slate gets 5
+   songs all tied at 0.00, just in file order. That is not a real recommendation.
+   I would detect an empty profile and return popular or diverse picks instead,
+   and say so.
+2. **Push for variety in the top 5.** The same loud songs keep showing up for
+   different people. I would add a rule that nudges the list to cover more than
+   one genre or mood, so a niche listener is not force-fed cross-genre filler.
+3. **Grow the catalog and let energy stop dominating.** With more songs per genre
+   and adjustable weights, the ranking would not lean so hard on the energy gap,
+   and mood-driven listeners would be served better.
 
 ---
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
+I learned that a recommender is really just ranking. Score everything, sort it,
+show the top few. The hard part is not the sorting. It is choosing the weights,
+because those choices quietly decide who the system serves well and who it
+ignores.
 
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+The thing that surprised me most was the Blank Slate. It still gave five
+"recommendations" with every score at 0.00. That taught me a system can look
+confident while knowing nothing. Now when I use a real music app, I wonder how
+much of what I see is a true match versus just filler dressed up as a
+recommendation.

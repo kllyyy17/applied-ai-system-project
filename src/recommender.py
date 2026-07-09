@@ -103,6 +103,20 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     where the points came from, e.g. "genre match (+2.0)".
     """
     weights = user_prefs.get("weights", {})
+
+    # --- EXPERIMENT: Weight Shift (energy x2, genre x0.5) ---
+    # Sensitivity test. Scale the incoming weights BEFORE scoring so only the
+    # relative importance changes; the closeness math (1 - |target - actual|) is
+    # untouched, so every term stays in its original range and the score stays a
+    # simple weighted sum. Currently OFF ({}) so output matches the README's
+    # baseline. Set to {"energy": 2.0, "genre": 0.5} to reproduce the experiment.
+    EXPERIMENT_WEIGHT_MULTIPLIERS = {}
+    if EXPERIMENT_WEIGHT_MULTIPLIERS and weights:
+        weights = {
+            feat: w * EXPERIMENT_WEIGHT_MULTIPLIERS.get(feat, 1.0)
+            for feat, w in weights.items()
+        }
+
     score = 0.0
     reasons: List[str] = []
 

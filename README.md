@@ -11,7 +11,12 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+My version is **VibeMatch 1.0**. It takes a short taste profile (a favorite
+genre, a mood, and targets for five sound features) and returns the top 5 songs
+from a 20-song catalog. Each pick comes with a plain-English reason, like "genre
+match" or "energy fit 92%." I built the scoring math, added the reasons, and ran
+five test profiles — three realistic and two designed to trip up the logic — to
+see where it works and where it breaks.
 
 ---
 
@@ -158,27 +163,324 @@ Top 5 recommendations for a 'lofi / chill' listener
 
 ---
 
+## Stress Testing with Diverse Profiles
+
+Terminal output from `python -m src.main` for five profiles defined in `src/main.py`:
+three realistic **core** listeners and two **adversarial** edge cases (a contradictory
+request and an empty profile) meant to stress-test the scoring logic.
+
+**1. High-Energy Pop** — upbeat, danceable, fast tempo.
+
+```
+Profile: High-Energy Pop
+Top 5 recommendations (target genre='pop', mood='happy')
+============================================================
+
+1. Sunrise City - Neon Echo  [pop / happy]
+   Score: 9.07
+   Reasons:
+     - genre match: pop (+2.0)
+     - mood match: happy (+1.0)
+     - energy fit 92% (+1.84)
+     - valence fit 99% (+0.99)
+     - danceability fit 94% (+0.94)
+     - acousticness fit 92% (+1.38)
+     - tempo fit 92% (+0.92)
+
+2. Gym Hero - Max Pulse  [pop / intense]
+   Score: 8.24
+   Reasons:
+     - genre match: pop (+2.0)
+     - energy fit 97% (+1.94)
+     - valence fit 92% (+0.92)
+     - danceability fit 97% (+0.97)
+     - acousticness fit 95% (+1.42)
+     - tempo fit 98% (+0.98)
+
+3. Rooftop Lights - Indigo Parade  [indie pop / happy]
+   Score: 6.73
+   Reasons:
+     - mood match: happy (+1.0)
+     - energy fit 86% (+1.72)
+     - valence fit 96% (+0.96)
+     - danceability fit 97% (+0.97)
+     - acousticness fit 75% (+1.12)
+     - tempo fit 96% (+0.96)
+
+4. Warehouse Pulse - Kilowatt  [edm / euphoric]
+   Score: 6.11
+   Reasons:
+     - energy fit 95% (+1.90)
+     - valence fit 87% (+0.87)
+     - danceability fit 94% (+0.94)
+     - acousticness fit 94% (+1.41)
+     - tempo fit 99% (+0.99)
+
+5. Neon Bazaar - Saffron Beat  [latin / festive]
+   Score: 5.92
+   Reasons:
+     - energy fit 93% (+1.86)
+     - valence fit 99% (+0.99)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 88% (+1.32)
+     - tempo fit 80% (+0.80)
+```
+
+**2. Chill Lofi** — calm, organic, study/relax vibe.
+
+```
+Profile: Chill Lofi
+Top 5 recommendations (target genre='lofi', mood='chill')
+============================================================
+
+1. Library Rain - Paper Lanterns  [lofi / chill]
+   Score: 9.34
+   Reasons:
+     - genre match: lofi (+2.0)
+     - mood match: chill (+1.0)
+     - energy fit 100% (+2.00)
+     - valence fit 100% (+1.00)
+     - danceability fit 97% (+0.97)
+     - acousticness fit 94% (+1.41)
+     - tempo fit 96% (+0.96)
+
+2. Midnight Coding - LoRoom  [lofi / chill]
+   Score: 9.11
+   Reasons:
+     - genre match: lofi (+2.0)
+     - mood match: chill (+1.0)
+     - energy fit 93% (+1.86)
+     - valence fit 96% (+0.96)
+     - danceability fit 93% (+0.93)
+     - acousticness fit 91% (+1.36)
+     - tempo fit 100% (+1.00)
+
+3. Focus Flow - LoRoom  [lofi / focused]
+   Score: 8.30
+   Reasons:
+     - genre match: lofi (+2.0)
+     - energy fit 95% (+1.90)
+     - valence fit 99% (+0.99)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 98% (+1.47)
+     - tempo fit 99% (+0.99)
+
+4. Spacewalk Thoughts - Orbit Bloom  [ambient / chill]
+   Score: 6.86
+   Reasons:
+     - mood match: chill (+1.0)
+     - energy fit 93% (+1.86)
+     - valence fit 95% (+0.95)
+     - danceability fit 86% (+0.86)
+     - acousticness fit 88% (+1.32)
+     - tempo fit 87% (+0.87)
+
+5. Coffee Shop Stories - Slow Stereo  [jazz / relaxed]
+   Score: 6.12
+   Reasons:
+     - energy fit 98% (+1.96)
+     - valence fit 89% (+0.89)
+     - danceability fit 99% (+0.99)
+     - acousticness fit 91% (+1.36)
+     - tempo fit 91% (+0.91)
+```
+
+**3. Deep Intense Rock** — hard-hitting, fast, electric, emotionally heavy.
+
+```
+Profile: Deep Intense Rock
+Top 5 recommendations (target genre='rock', mood='intense')
+============================================================
+
+1. Storm Runner - Voltline  [rock / intense]
+   Score: 9.31
+   Reasons:
+     - genre match: rock (+2.0)
+     - mood match: intense (+1.0)
+     - energy fit 99% (+1.98)
+     - valence fit 92% (+0.92)
+     - danceability fit 94% (+0.94)
+     - acousticness fit 98% (+1.47)
+     - tempo fit 100% (+1.00)
+
+2. Gym Hero - Max Pulse  [pop / intense]
+   Score: 6.58
+   Reasons:
+     - mood match: intense (+1.0)
+     - energy fit 99% (+1.98)
+     - valence fit 63% (+0.63)
+     - danceability fit 72% (+0.72)
+     - acousticness fit 93% (+1.40)
+     - tempo fit 86% (+0.86)
+
+3. Iron Verdict - Ashgrave  [metal / angry]
+   Score: 6.03
+   Reasons:
+     - energy fit 95% (+1.90)
+     - valence fit 88% (+0.88)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 94% (+1.41)
+     - tempo fit 89% (+0.89)
+
+4. Warehouse Pulse - Kilowatt  [edm / euphoric]
+   Score: 5.52
+   Reasons:
+     - energy fit 97% (+1.94)
+     - valence fit 68% (+0.68)
+     - danceability fit 69% (+0.69)
+     - acousticness fit 92% (+1.38)
+     - tempo fit 83% (+0.83)
+
+5. Night Drive Loop - Neon Echo  [synthwave / moody]
+   Score: 5.49
+   Reasons:
+     - energy fit 83% (+1.66)
+     - valence fit 91% (+0.91)
+     - danceability fit 87% (+0.87)
+     - acousticness fit 90% (+1.35)
+     - tempo fit 70% (+0.70)
+```
+
+**4. The Contradiction (adversarial)** — sad mood/valence but high energy/tempo; the signals fight.
+
+```
+Profile: The Contradiction (sad + high-energy)
+Top 5 recommendations (target genre='blues', mood='somber')
+============================================================
+
+1. Gritline - South Bend Blues Co  [blues / somber]
+   Score: 7.17
+   Reasons:
+     - genre match: blues (+2.0)
+     - mood match: somber (+1.0)
+     - energy fit 49% (+0.98)
+     - valence fit 69% (+0.69)
+     - danceability fit 98% (+0.98)
+     - acousticness fit 73% (+1.09)
+     - tempo fit 42% (+0.42)
+
+2. Iron Verdict - Ashgrave  [metal / angry]
+   Score: 5.56
+   Reasons:
+     - energy fit 98% (+1.96)
+     - valence fit 82% (+0.82)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 56% (+0.84)
+     - tempo fit 99% (+0.99)
+
+3. Storm Runner - Voltline  [rock / intense]
+   Score: 5.16
+   Reasons:
+     - energy fit 96% (+1.92)
+     - valence fit 62% (+0.62)
+     - danceability fit 84% (+0.84)
+     - acousticness fit 60% (+0.90)
+     - tempo fit 88% (+0.88)
+
+4. Night Drive Loop - Neon Echo  [synthwave / moody]
+   Score: 4.64
+   Reasons:
+     - energy fit 80% (+1.60)
+     - valence fit 61% (+0.61)
+     - danceability fit 77% (+0.77)
+     - acousticness fit 72% (+1.08)
+     - tempo fit 58% (+0.58)
+
+5. Dust & Diesel - Hank Ro120  [country / nostalgic]
+   Score: 4.61
+   Reasons:
+     - energy fit 66% (+1.32)
+     - valence fit 52% (+0.52)
+     - danceability fit 87% (+0.87)
+     - acousticness fit 88% (+1.32)
+     - tempo fit 58% (+0.58)
+```
+
+**5. The Blank Slate (adversarial)** — empty profile `{}`; every song scores 0.0 and order comes from the CSV.
+
+```
+Profile: The Blank Slate (no preferences)
+Top 5 recommendations (target genre='any', mood='any')
+============================================================
+
+1. Sunrise City - Neon Echo  [pop / happy]
+   Score: 0.00
+   Reasons:
+     - no strong matches
+
+2. Midnight Coding - LoRoom  [lofi / chill]
+   Score: 0.00
+   Reasons:
+     - no strong matches
+
+3. Storm Runner - Voltline  [rock / intense]
+   Score: 0.00
+   Reasons:
+     - no strong matches
+
+4. Library Rain - Paper Lanterns  [lofi / chill]
+   Score: 0.00
+   Reasons:
+     - no strong matches
+
+5. Gym Hero - Max Pulse  [pop / intense]
+   Score: 0.00
+   Reasons:
+     - no strong matches
+```
+
+---
+
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+### Weight Shift: energy ×2, genre ×0.5
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+I scaled the incoming weights in `score_song` (`recommender.py`) so energy counted
+double and genre counted half, leaving the closeness math (`1 - |target - actual|`)
+untouched. The change is a toggleable block controlled by `EXPERIMENT_WEIGHT_MULTIPLIERS`
+(set to `{}` to restore the baseline).
+
+**Result:** For the three core profiles and the Blank Slate the **ranking was unchanged** —
+only the raw scores rose, because energy fit was already high for those listeners. The
+change was *just different, not more accurate*.
+
+The one real shift was the adversarial **Contradiction** profile (sad mood, high energy):
+
+| Rank | Baseline | Weight Shift |
+|------|----------|--------------|
+| 1 | Gritline `[blues / somber]` — 7.17 | **Iron Verdict `[metal / angry]` — 7.52** |
+| 2 | Iron Verdict `[metal / angry]` — 5.56 | Gritline `[blues / somber]` — 7.15 |
+
+Halving genre and doubling energy tipped the tie away from the true `blues / somber` match
+toward a loud `metal / angry` track — the user asked for sad blues and now gets angry metal
+on top. So this change made the edge case *less* accurate, confirming how sensitive the
+ranking is to the balance between the categorical bonus and the numeric fit terms.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+VibeMatch has real limits. The biggest ones:
 
-Examples:
+- **Tiny, lopsided catalog.** There are only 20 songs across 17 genres. Most
+  genres have just one song. So a niche listener (classical, folk, blues) has
+  one true match and gets filler after that. A lofi or pop fan gets a much
+  better list.
+- **Energy quietly dominates.** Energy is the heaviest numeric weight (2.0), so
+  the ranking leans hard on how close a song's energy is. Listeners who care
+  more about mood or acousticness are still ranked mostly on energy. My weight
+  shift experiment showed how sensitive this is: doubling energy flipped the
+  "sad + high-energy" profile so angry metal beat the true blues match.
+- **No sense of "I don't know you yet."** An empty profile still returns 5 songs,
+  all tied at 0.00, in file order. That is not a real recommendation, but it
+  looks like one.
+- **No variety rule.** The same loud songs show up for different people. Nothing
+  pushes the top 5 to cover more than one vibe.
+- **Shallow data.** No lyrics, no language, no year, no listening history. It
+  only knows the numbers I hand-labeled, so any labeling bias flows straight
+  into the scores.
 
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+I go deeper on these in the [model card](model_card.md).
 
 ---
 
@@ -188,10 +490,21 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
+I learned that a recommender is really just ranking. You turn songs and taste
+into numbers, give each song points, sort them, and show the top few. The
+prediction is not magic. It is math on features. What surprised me was how much
+power hides in the weights. I never told the system to favor energy, but by
+making energy the heaviest weight, I quietly did. Small choices about weights
+decide who gets good results and who gets filler.
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+That is also where bias sneaks in. My catalog has one song for most genres, so
+niche listeners are underserved before the scoring even starts — the data
+itself is unfair. On top of that, the system looks confident even when it knows
+nothing: the empty profile still returns 5 "recommendations." A real app doing
+this at scale could keep pushing the same popular sounds and slowly bury
+everything else, and users would not see it happening. Now I think of music apps
+less as neutral helpers and more as systems shaped by whoever picked the data
+and the weights.
 
 
 
