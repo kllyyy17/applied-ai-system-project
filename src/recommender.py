@@ -30,21 +30,82 @@ class UserProfile:
     target_energy: float
     likes_acoustic: bool
 
+# Default per-feature weights. Shared single source of truth so the OOP
+# Recommender and main.py's profiles score identically (see main.py's
+# BALANCED_WEIGHTS, which aliases this).
+DEFAULT_WEIGHTS = {
+    "genre": 2.0,
+    "mood": 1.0,
+    "energy": 2.0,
+    "valence": 1.0,
+    "danceability": 1.0,
+    "acousticness": 1.5,
+    "tempo": 1.0,
+}
+
+
+def _song_to_dict(song: "Song") -> Dict:
+    """Convert a Song dataclass into the plain dict that score_song expects."""
+    return {
+        "id": song.id,
+        "title": song.title,
+        "artist": song.artist,
+        "genre": song.genre,
+        "mood": song.mood,
+        "energy": song.energy,
+        "tempo_bpm": song.tempo_bpm,
+        "valence": song.valence,
+        "danceability": song.danceability,
+        "acousticness": song.acousticness,
+    }
+
+
+def _profile_to_prefs(user: "UserProfile") -> Dict:
+    """
+    Translate a UserProfile into the user_prefs dict used by score_song.
+
+    UserProfile only carries genre, mood, a target energy, and a boolean
+    `likes_acoustic`. We map likes_acoustic onto a concrete acousticness
+    target (0.8 if they like acoustic, else 0.2) and attach DEFAULT_WEIGHTS.
+    Numeric targets we don't have (valence, danceability, tempo) are simply
+    omitted; score_song skips any feature whose target is None.
+    """
+    return {
+        "favorite_genre": user.favorite_genre,
+        "favorite_mood": user.favorite_mood,
+        "target_energy": user.target_energy,
+        "target_acousticness": 0.8 if user.likes_acoustic else 0.2,
+        "weights": DEFAULT_WEIGHTS,
+    }
+
+
 class Recommender:
     """
-    OOP implementation of the recommendation logic.
+    OOP wrapper over the functional scoring core (score_song / recommend_songs).
+
+    This is a thin adapter, not a second implementation: it translates the
+    Song / UserProfile dataclasses into the dict form the core understands,
+    delegates the real ranking to recommend_songs, then maps results back to
+    Song objects. main.py and these classes therefore share one code path.
     Required by tests/test_recommender.py
     """
     def __init__(self, songs: List[Song]):
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        prefs = _profile_to_prefs(user)
+        song_dicts = [_song_to_dict(s) for s in self.songs]
+        ranked = recommend_songs(prefs, song_dicts, k=k)
+
+        # Map the scored dicts back to the original Song objects by id so
+        # callers get Song instances (attribute access), sorted by score.
+        by_id = {s.id: s for s in self.songs}
+        return [by_id[song["id"]] for song, _score, _explanation in ranked]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        prefs = _profile_to_prefs(user)
+        _score, reasons = score_song(prefs, _song_to_dict(song))
+        return "; ".join(reasons) if reasons else "no strong matches"
 
 def load_songs(csv_path: str) -> List[Dict]:
     """
