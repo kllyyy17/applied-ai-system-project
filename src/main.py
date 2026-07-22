@@ -17,22 +17,17 @@ The scoring itself lives in recommender.py:
 
 # Works both as `python -m src.main` (relative) and `python src/main.py` (absolute).
 try:
-    from .recommender import load_songs, recommend_songs
+    from .recommender import load_songs, DEFAULT_WEIGHTS
+    from .reliability import recommend_with_guardrails, configure_logging
 except ImportError:
-    from recommender import load_songs, recommend_songs
+    from recommender import load_songs, DEFAULT_WEIGHTS
+    from reliability import recommend_with_guardrails, configure_logging
 
 
 # A reusable "balanced" weight set so profiles differ by *targets*, not by
-# weighting. This keeps comparisons across profiles fair.
-BALANCED_WEIGHTS = {
-    "genre": 2.0,
-    "mood": 1.0,
-    "energy": 2.0,
-    "valence": 1.0,
-    "danceability": 1.0,
-    "acousticness": 1.5,
-    "tempo": 1.0,
-}
+# weighting. This keeps comparisons across profiles fair. Aliased to the
+# shared DEFAULT_WEIGHTS in recommender.py so the two never drift apart.
+BALANCED_WEIGHTS = DEFAULT_WEIGHTS
 
 
 # ---------------------------------------------------------------------------
@@ -115,19 +110,37 @@ ADVERSARIAL_PROFILES = [
 
 
 def print_recommendations(name: str, user_prefs: dict, songs: list) -> None:
-    """Run the recommender for one profile and print its top 5 with reasons."""
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    """
+    Run the guarded recommender for one profile and print its top 5.
+
+    Output is shaped by the reliability layer: a blank slate prints an honest
+    "I don't know you yet" sampler, real profiles print a confidence banner, and
+    cross-genre filler picks are labelled instead of shown as equals.
+    """
+    recommendations, verdict = recommend_with_guardrails(user_prefs, songs, k=5)
 
     genre = user_prefs.get("favorite_genre", "any")
     mood = user_prefs.get("favorite_mood", "any")
+    conf = verdict["confidence"]
     print(f"\nProfile: {name}")
-    print(f"Top {len(recommendations)} recommendations "
-          f"(target genre='{genre}', mood='{mood}')")
+
+    if verdict["blank_slate"]:
+        print("  [guardrail] No preferences given - I don't know your taste yet.")
+        print("  Showing a diverse sampler instead of a fake match:")
+    else:
+        print(f"Top {len(recommendations)} recommendations "
+              f"(target genre='{genre}', mood='{mood}')")
+        print(f"  Confidence: {conf['level'].upper()} ({conf['score']:.0%}) "
+              f"- {conf['reason']}")
+        if verdict["n_filler"]:
+            print(f"  Note: {verdict['n_filler']} of {len(recommendations)} picks "
+                  f"are cross-genre filler (no genre/mood match).")
     print("=" * 60)
 
-    for rank, (song, score, explanation) in enumerate(recommendations, start=1):
+    for rank, (song, score, explanation, filler) in enumerate(recommendations, start=1):
+        tag = "  [filler]" if filler else ""
         print(f"\n{rank}. {song['title']} - {song['artist']}  "
-              f"[{song['genre']} / {song['mood']}]")
+              f"[{song['genre']} / {song['mood']}]{tag}")
         print(f"   Score: {score:.2f}")
         print("   Reasons:")
         # explanation is a "; "-joined string of reasons; show one per line.
@@ -136,6 +149,7 @@ def print_recommendations(name: str, user_prefs: dict, songs: list) -> None:
 
 
 def main() -> None:
+    configure_logging()
     songs = load_songs("data/songs.csv")
     print(f"Loaded songs: {len(songs)}")
 
