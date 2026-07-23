@@ -1,0 +1,85 @@
+# Evaluation cases for VibeMatch.
+#
+# Each case is a user profile plus the properties we EXPECT the system to
+# produce. eval/evaluate.py runs the guarded recommender over every case and
+# checks the results against these expectations.
+#
+# `weights` is intentionally omitted - evaluate.py injects the shared
+# DEFAULT_WEIGHTS so cases stay focused on *targets*, matching main.py.
+#
+# expect fields (all optional):
+#   top_genre       - genre of the #1 recommendation
+#   top_mood        - mood of the #1 recommendation
+#   min_confidence  - lowest acceptable confidence level (low < medium < high)
+#   blank_slate     - whether the blank-slate guardrail should fire
+#   min_filler      - minimum number of picks flagged as cross-genre filler
+
+- name: High-Energy Pop
+  kind: core
+  prefs:
+    favorite_genre: pop
+    favorite_mood: happy
+    target_energy: 0.90
+    target_valence: 0.85
+    target_danceability: 0.85
+    target_acousticness: 0.10
+    target_tempo: 0.57
+  expect:
+    top_genre: pop
+    top_mood: happy
+    min_confidence: high
+    blank_slate: false
+
+- name: Chill Lofi
+  kind: core
+  prefs:
+    favorite_genre: lofi
+    favorite_mood: chill
+    target_energy: 0.35
+    target_valence: 0.60
+    target_danceability: 0.55
+    target_acousticness: 0.80
+    target_tempo: 0.20
+  expect:
+    top_genre: lofi
+    top_mood: chill
+    min_confidence: high
+    blank_slate: false
+
+- name: Deep Intense Rock
+  kind: core
+  prefs:
+    favorite_genre: rock
+    favorite_mood: intense
+    target_energy: 0.92
+    target_valence: 0.40
+    target_danceability: 0.60
+    target_acousticness: 0.12
+    target_tempo: 0.73
+  expect:
+    top_genre: rock
+    top_mood: intense
+    min_confidence: high
+    blank_slate: false
+
+- name: The Contradiction
+  kind: adversarial
+  prefs:
+    favorite_genre: blues
+    favorite_mood: somber
+    target_energy: 0.95
+    target_valence: 0.10
+    target_danceability: 0.50
+    target_acousticness: 0.50
+    target_tempo: 0.85
+  expect:
+    top_genre: blues
+    top_mood: somber
+    blank_slate: false
+    min_filler: 1
+
+- name: The Blank Slate
+  kind: adversarial
+  prefs: {}
+  expect:
+    blank_slate: true
