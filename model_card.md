@@ -174,3 +174,99 @@ The thing that surprised me most was the Blank Slate. It still gave five
 confident while knowing nothing. Now when I use a real music app, I wonder how
 much of what I see is a true match versus just filler dressed up as a
 recommendation.
+
+---
+
+## 10. Reflection and Ethics (VibeMatch 2.0)
+
+_This section covers the reliability layer added in **VibeMatch 2.0**
+(`src/reliability.py`, `eval/`, `tests/`) — the confidence scoring, filler
+flagging, blank-slate guardrail, and the offline evaluation harness that gates
+them._
+
+### What are the limitations or biases in your system?
+
+The core bias is a **genre filter bubble driven by catalog imbalance**, and the
+reliability layer exposes it rather than removing it. With 15 of 17 genres
+represented by a single song, a lofi or pop listener gets a coherent list while
+a classical, folk, or blues fan gets one true match and cross-genre filler at
+ranks 2–5. The evaluation report makes this measurable: The Contradiction case
+carries **4 of 5 filler picks** and is the only profile with non-zero rank churn
+(**20%** under the weight nudge), because energy is the heaviest numeric weight
+(2.0) and quietly dominates the ranking for anyone who cares more about mood.
+
+The confidence metric has its own limitation, and it is honest about it in the
+design docs but still worth naming: **confidence measures only the top pick**
+(`top_score / max_possible_score`), so it can read **HIGH (75%) while 4 of 5
+picks are filler**. It answers "is the #1 result a good fit?" not "is this whole
+list any good?" There is also no notion of real-world accuracy — with no
+listening history, confidence is a fit-to-stated-profile proxy, not a claim that
+the user will like the songs. Finally, every metric is measured against
+**human-authored expectations** in `eval/cases.yaml`; the system is only as
+unbiased as the five cases and thresholds a person chose to write.
+
+### Could your AI be misused, and how would you prevent that?
+
+The realistic misuse is **misrepresenting confidence as endorsement** — shipping
+a "98% confidence" banner as if it were a quality guarantee, when it only means
+the top song closely matches the numbers the user typed. Downstream, that could
+be used to justify decisions the system was never built for (curating a public
+playlist, ranking artists, A/B-testing listeners) on a 20-song hand-made catalog.
+A filler pick presented without its label could also mislead someone into
+thinking a padded recommendation was a real match.
+
+Prevention is built into the system rather than left to a disclaimer:
+- **Filler is always labelled** and the blank-slate guardrail refuses to fake a
+  match, so low-quality output cannot silently pose as a real recommendation.
+- **The confidence string states its own basis** ("top pick scored X of Y
+  possible") instead of a bare percentage, so it can't be quoted as a general
+  quality score without the caveat travelling with it.
+- **Every run is logged** to `vibematch.log` (profile, guardrails fired,
+  confidence, filler count), giving an audit trail if outputs are ever disputed.
+- **The model card scopes intended use** to classroom exploration and explicitly
+  lists non-intended uses (real listeners, judging artists, real decisions).
+
+The strongest structural guard is that a **human authors the expectations and
+reviews the report** — the evaluation harness is a checkpoint, not an autopilot.
+
+### What surprised me while testing my AI's reliability?
+
+Two things. First, that **the honest signals disagree with each other** on the
+adversarial case: the confidence bucket says HIGH while the filler count says
+"4 of 5 of this list is padding." I expected a reliability layer to give one
+clean verdict; instead it taught me that "trustworthy" is several separate
+questions, and a single number hides that.
+
+Second, the **stability probe reproduced a manual finding automatically**. In
+VibeMatch 1.0 I discovered the energy-vs-genre weight sensitivity by hand. In 2.0
+the harness re-derived it with no manual poking: nudging weights (energy ×1.25,
+genre ×0.75) leaves the three core profiles at **0% churn** but moves **20%** of
+The Contradiction's list. Watching a metric surface the exact fragile case on its
+own — turning a one-off observation into a repeatable regression check — was the
+moment the "reliability engineering" idea clicked.
+
+### Collaboration with AI during this project
+
+I used an AI assistant to think through the reliability architecture and the
+evaluation design, then implemented and verified against the real output myself.
+
+**A helpful suggestion.** When I described wanting to add trust features without
+breaking the working recommender, the AI suggested treating reliability as a
+**wrapper around the existing scoring core** rather than rewriting it —
+`recommend_with_guardrails()` calls the original `recommend_songs()`. The
+downstream payoff was one I hadn't anticipated: because the guardrails wrap the
+real path, the evaluation harness can exercise the **exact code the app runs**
+(`eval/evaluate.py` imports `recommend_with_guardrails`), so the tests measure
+shipping behavior instead of a copy. That kept the AI logic and the trust logic
+cleanly separable and made the whole thing testable.
+
+**A flawed suggestion.** The AI's first proposal for the confidence score was to
+average the scores of all five recommendations. That sounded reasonable but was
+wrong for this system: a profile with lots of filler would average *down* and
+report low confidence even when the **#1 pick was excellent**, conflating
+"is the best match good?" with "is the list padded?" — two questions the design
+deliberately keeps separate (filler count already answers the second). I rejected
+it and used **top score ÷ best-possible score** instead. Testing then revealed
+the residual limitation I documented above (HIGH confidence can still coexist
+with heavy filler), which confirmed that top-pick and whole-list quality really
+are distinct signals that should not be collapsed into one average.
