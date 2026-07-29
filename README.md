@@ -149,11 +149,6 @@ high-energy request drags in angry metal and intense rock. The confidence looks
 high (the #1 pick is decent) while the filler note reveals the rest of the list
 is padding. This is exactly the honesty the reliability layer adds.
 
-> ℹ️ The three cases above are abbreviated for readability. The **full, verbatim
-> command output** for every command is captured under [logs/](logs/) and
-> reproduced in the [Reproducible Execution Evidence](#reproducible-execution-evidence)
-> section below.
-
 ### 3. An empty profile → the blank-slate guardrail
 
 **Input:** `{}` — no preferences at all.
@@ -175,6 +170,11 @@ Before the reliability layer, an empty profile returned five songs tied at 0.00
 in file order — a fake recommendation dressed up as a real one. Now the system
 says it doesn't know you and returns **one song per distinct genre** as an
 honest sampler.
+
+> ℹ️ The three cases above are abbreviated for readability. The **full, verbatim
+> command output** for every command is captured under [logs/](logs/) and
+> reproduced in the [Reproducible Execution Evidence](#reproducible-execution-evidence)
+> section below.
 
 ---
 
@@ -392,19 +392,19 @@ Run with `pytest` (10 tests) and `python -m eval.evaluate` (metrics report).
   hard to serve well; the tests confirm the *behavior* is correct but can't fix
   the thin data.
 
-**What I learned:** writing the harness first forced me to define what "correct"
-even means for a recommender (top-1 genre/mood, determinism, stability), and
-several of those definitions were not obvious until I tried to assert them.
+Defining the eval harness first was what forced these definitions of "correct"
+into the open — top-1 genre/mood, determinism, and stability were only made
+precise once they had to be asserted in code.
 
 ---
 
-## Reflection
+## Design Philosophy
 
-Building the reliability layer taught me that most of the engineering in a
-trustworthy AI system lives *around* the model, not inside it — detecting when
-the system doesn't know enough, labelling low-quality output, and making
-behavior reproducible and testable mattered more than the scoring math itself.
+Most of the engineering in a trustworthy AI system lives *around* the model, not
+inside it. Detecting when the system doesn't know enough, labelling low-quality
+output, and making behavior reproducible and testable matter as much as the
+scoring math itself — which is why VibeMatch 2.0 treats the reliability layer as
+a first-class part of the system rather than an afterthought.
 
-> The graded responsible-AI reflection — how I collaborated with AI, one helpful
-> and one flawed AI suggestion, and the system's limitations and bias — is in
-> the **[model card](model_card.md)**.
+> Responsible-AI notes — model assumptions, limitations, and bias
+> considerations — are documented in the **[model card](model_card.md)**.
