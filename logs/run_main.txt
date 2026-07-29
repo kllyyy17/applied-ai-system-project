@@ -1,0 +1,259 @@
+Loaded songs: 20
+
+############################################################
+# CORE PROFILES
+############################################################
+
+Profile: High-Energy Pop
+Top 5 recommendations (target genre='pop', mood='happy')
+  Confidence: HIGH (95%) - top pick scored 9.07 of 9.50 possible
+  Note: 2 of 5 picks are cross-genre filler (no genre/mood match).
+============================================================
+
+1. Sunrise City - Neon Echo  [pop / happy]
+   Score: 9.07
+   Reasons:
+     - genre match: pop (+2.0)
+     - mood match: happy (+1.0)
+     - energy fit 92% (+1.84)
+     - valence fit 99% (+0.99)
+     - danceability fit 94% (+0.94)
+     - acousticness fit 92% (+1.38)
+     - tempo fit 92% (+0.92)
+
+2. Gym Hero - Max Pulse  [pop / intense]
+   Score: 8.24
+   Reasons:
+     - genre match: pop (+2.0)
+     - energy fit 97% (+1.94)
+     - valence fit 92% (+0.92)
+     - danceability fit 97% (+0.97)
+     - acousticness fit 95% (+1.42)
+     - tempo fit 98% (+0.98)
+
+3. Rooftop Lights - Indigo Parade  [indie pop / happy]
+   Score: 6.73
+   Reasons:
+     - mood match: happy (+1.0)
+     - energy fit 86% (+1.72)
+     - valence fit 96% (+0.96)
+     - danceability fit 97% (+0.97)
+     - acousticness fit 75% (+1.12)
+     - tempo fit 96% (+0.96)
+
+4. Warehouse Pulse - Kilowatt  [edm / euphoric]  [filler]
+   Score: 6.11
+   Reasons:
+     - energy fit 95% (+1.90)
+     - valence fit 87% (+0.87)
+     - danceability fit 94% (+0.94)
+     - acousticness fit 94% (+1.41)
+     - tempo fit 99% (+0.99)
+
+5. Neon Bazaar - Saffron Beat  [latin / festive]  [filler]
+   Score: 5.92
+   Reasons:
+     - energy fit 93% (+1.86)
+     - valence fit 99% (+0.99)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 88% (+1.32)
+     - tempo fit 80% (+0.80)
+
+Profile: Chill Lofi
+Top 5 recommendations (target genre='lofi', mood='chill')
+  Confidence: HIGH (98%) - top pick scored 9.34 of 9.50 possible
+  Note: 1 of 5 picks are cross-genre filler (no genre/mood match).
+============================================================
+
+1. Library Rain - Paper Lanterns  [lofi / chill]
+   Score: 9.34
+   Reasons:
+     - genre match: lofi (+2.0)
+     - mood match: chill (+1.0)
+     - energy fit 100% (+2.00)
+     - valence fit 100% (+1.00)
+     - danceability fit 97% (+0.97)
+     - acousticness fit 94% (+1.41)
+     - tempo fit 96% (+0.96)
+
+2. Midnight Coding - LoRoom  [lofi / chill]
+   Score: 9.11
+   Reasons:
+     - genre match: lofi (+2.0)
+     - mood match: chill (+1.0)
+     - energy fit 93% (+1.86)
+     - valence fit 96% (+0.96)
+     - danceability fit 93% (+0.93)
+     - acousticness fit 91% (+1.36)
+     - tempo fit 100% (+1.00)
+
+3. Focus Flow - LoRoom  [lofi / focused]
+   Score: 8.30
+   Reasons:
+     - genre match: lofi (+2.0)
+     - energy fit 95% (+1.90)
+     - valence fit 99% (+0.99)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 98% (+1.47)
+     - tempo fit 99% (+0.99)
+
+4. Spacewalk Thoughts - Orbit Bloom  [ambient / chill]
+   Score: 6.86
+   Reasons:
+     - mood match: chill (+1.0)
+     - energy fit 93% (+1.86)
+     - valence fit 95% (+0.95)
+     - danceability fit 86% (+0.86)
+     - acousticness fit 88% (+1.32)
+     - tempo fit 87% (+0.87)
+
+5. Coffee Shop Stories - Slow Stereo  [jazz / relaxed]  [filler]
+   Score: 6.12
+   Reasons:
+     - energy fit 98% (+1.96)
+     - valence fit 89% (+0.89)
+     - danceability fit 99% (+0.99)
+     - acousticness fit 91% (+1.36)
+     - tempo fit 91% (+0.91)
+
+Profile: Deep Intense Rock
+Top 5 recommendations (target genre='rock', mood='intense')
+  Confidence: HIGH (98%) - top pick scored 9.31 of 9.50 possible
+  Note: 3 of 5 picks are cross-genre filler (no genre/mood match).
+============================================================
+
+1. Storm Runner - Voltline  [rock / intense]
+   Score: 9.31
+   Reasons:
+     - genre match: rock (+2.0)
+     - mood match: intense (+1.0)
+     - energy fit 99% (+1.98)
+     - valence fit 92% (+0.92)
+     - danceability fit 94% (+0.94)
+     - acousticness fit 98% (+1.47)
+     - tempo fit 100% (+1.00)
+
+2. Gym Hero - Max Pulse  [pop / intense]
+   Score: 6.58
+   Reasons:
+     - mood match: intense (+1.0)
+     - energy fit 99% (+1.98)
+     - valence fit 63% (+0.63)
+     - danceability fit 72% (+0.72)
+     - acousticness fit 93% (+1.40)
+     - tempo fit 86% (+0.86)
+
+3. Iron Verdict - Ashgrave  [metal / angry]  [filler]
+   Score: 6.03
+   Reasons:
+     - energy fit 95% (+1.90)
+     - valence fit 88% (+0.88)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 94% (+1.41)
+     - tempo fit 89% (+0.89)
+
+4. Warehouse Pulse - Kilowatt  [edm / euphoric]  [filler]
+   Score: 5.52
+   Reasons:
+     - energy fit 97% (+1.94)
+     - valence fit 68% (+0.68)
+     - danceability fit 69% (+0.69)
+     - acousticness fit 92% (+1.38)
+     - tempo fit 83% (+0.83)
+
+5. Night Drive Loop - Neon Echo  [synthwave / moody]  [filler]
+   Score: 5.49
+   Reasons:
+     - energy fit 83% (+1.66)
+     - valence fit 91% (+0.91)
+     - danceability fit 87% (+0.87)
+     - acousticness fit 90% (+1.35)
+     - tempo fit 70% (+0.70)
+
+
+############################################################
+# ADVERSARIAL / EDGE-CASE PROFILES
+############################################################
+
+Profile: The Contradiction (sad + high-energy)
+Top 5 recommendations (target genre='blues', mood='somber')
+  Confidence: HIGH (75%) - top pick scored 7.17 of 9.50 possible
+  Note: 4 of 5 picks are cross-genre filler (no genre/mood match).
+============================================================
+
+1. Gritline - South Bend Blues Co  [blues / somber]
+   Score: 7.17
+   Reasons:
+     - genre match: blues (+2.0)
+     - mood match: somber (+1.0)
+     - energy fit 49% (+0.98)
+     - valence fit 69% (+0.69)
+     - danceability fit 98% (+0.98)
+     - acousticness fit 73% (+1.09)
+     - tempo fit 42% (+0.42)
+
+2. Iron Verdict - Ashgrave  [metal / angry]  [filler]
+   Score: 5.56
+   Reasons:
+     - energy fit 98% (+1.96)
+     - valence fit 82% (+0.82)
+     - danceability fit 95% (+0.95)
+     - acousticness fit 56% (+0.84)
+     - tempo fit 99% (+0.99)
+
+3. Storm Runner - Voltline  [rock / intense]  [filler]
+   Score: 5.16
+   Reasons:
+     - energy fit 96% (+1.92)
+     - valence fit 62% (+0.62)
+     - danceability fit 84% (+0.84)
+     - acousticness fit 60% (+0.90)
+     - tempo fit 88% (+0.88)
+
+4. Night Drive Loop - Neon Echo  [synthwave / moody]  [filler]
+   Score: 4.64
+   Reasons:
+     - energy fit 80% (+1.60)
+     - valence fit 61% (+0.61)
+     - danceability fit 77% (+0.77)
+     - acousticness fit 72% (+1.08)
+     - tempo fit 58% (+0.58)
+
+5. Dust & Diesel - Hank Ro120  [country / nostalgic]  [filler]
+   Score: 4.61
+   Reasons:
+     - energy fit 66% (+1.32)
+     - valence fit 52% (+0.52)
+     - danceability fit 87% (+0.87)
+     - acousticness fit 88% (+1.32)
+     - tempo fit 58% (+0.58)
+
+Profile: The Blank Slate (no preferences)
+  [guardrail] No preferences given - I don't know your taste yet.
+  Showing a diverse sampler instead of a fake match:
+============================================================
+
+1. Sunrise City - Neon Echo  [pop / happy]
+   Score: 0.00
+   Reasons:
+     - diverse fallback pick (no profile provided)
+
+2. Midnight Coding - LoRoom  [lofi / chill]
+   Score: 0.00
+   Reasons:
+     - diverse fallback pick (no profile provided)
+
+3. Storm Runner - Voltline  [rock / intense]
+   Score: 0.00
+   Reasons:
+     - diverse fallback pick (no profile provided)
+
+4. Spacewalk Thoughts - Orbit Bloom  [ambient / chill]
+   Score: 0.00
+   Reasons:
+     - diverse fallback pick (no profile provided)
+
+5. Coffee Shop Stories - Slow Stereo  [jazz / relaxed]
+   Score: 0.00
+   Reasons:
+     - diverse fallback pick (no profile provided)

@@ -1,0 +1,19 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\lykim\CodePath AI110\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\lykim\CodePath AI110\applied-ai-system-project.git
+plugins: anyio-4.14.0
+collecting ... collected 10 items
+
+tests/test_eval.py::test_top1_genre_accuracy PASSED                      [ 10%]
+tests/test_eval.py::test_top1_mood_accuracy PASSED                       [ 20%]
+tests/test_eval.py::test_all_runs_are_deterministic PASSED               [ 30%]
+tests/test_eval.py::test_guardrails_behave_as_expected PASSED            [ 40%]
+tests/test_eval.py::test_blank_slate_guardrail_fires PASSED              [ 50%]
+tests/test_eval.py::test_core_ranking_is_stable_under_small_weight_nudge PASSED [ 60%]
+tests/test_eval.py::test_every_case_passes PASSED                        [ 70%]
+tests/test_eval.py::test_determinism_helper_directly PASSED              [ 80%]
+tests/test_recommender.py::test_recommend_returns_songs_sorted_by_score PASSED [ 90%]
+tests/test_recommender.py::test_explain_recommendation_returns_non_empty_string PASSED [100%]
+
+============================= 10 passed in 0.13s ==============================
